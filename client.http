@@ -1,0 +1,98 @@
+@baseUrl = http://localhost:3333
+@authToken = {{login_password.response.body.token}}
+
+# @name register_account
+POST {{baseUrl}}/accounts/register
+Content-Type: application/json
+
+{
+  "email": "danilo@test.com",
+  "password": "123123",
+  "fullName": "Danilo Felipe"
+}
+
+###
+
+# @name login_password
+POST {{baseUrl}}/sessions/auth/password
+Content-Type: application/json
+
+{
+  "email": "danilo@d.com",
+  "password": "123123"
+}
+
+###
+
+# @name request_code
+POST {{baseUrl}}/sessions/auth/request-code
+Content-Type: application/json
+
+{
+  "email": "danilo@test.com"
+}
+
+###
+
+# @name login_code
+POST {{baseUrl}}/sessions/auth/code
+Content-Type: application/json
+
+{
+  "token": "cltpuhw4s0007lngcd80bw0xy",
+  "code": "111111"
+}
+
+###
+
+# @name create_group
+POST {{baseUrl}}/groups
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "Group Test",
+  "description": "Group Test"
+}
+
+###
+
+# @name list_group
+GET {{baseUrl}}/groups?pageIndex=0
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+# @name create_bet
+POST {{baseUrl}}/bets
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "groupId": "cltrpiz6g0000a3fh02gltjm9",
+  "participants": [
+    {"name": "Juju", "pictureUrl": "https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/c5/c5addcd7ecd1da872b9d44b8aa5ea6510cd7d826_full.jpg"},
+    {"name": "Bun", "pictureUrl": "https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/f5/f5734be80059890f57b6b6e6260813fb15bd7a30_full.jpg"}
+  ]
+}
+
+###
+
+# @name list_bet
+GET {{baseUrl}}/bets?groupId=cltrpiz6g0000a3fh02gltjm9
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+###
+
+
+# @name list_bet
+POST {{baseUrl}}/bets/bet
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+###
+
+# @name presigned_url
+GET {{baseUrl}}/upload/presigned?fileName=teste
+Content-Type: application/json
+###

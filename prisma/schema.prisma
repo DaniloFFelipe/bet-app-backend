@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(cuid())
+
+  fullName  String
+  email     String  @unique
+  password  String
+  avatarUrl String? @map("avatar_url")
+
+  auth        AuthLinks?
+  memberships Member[]
+
+  @@map("users")
+}
+
+model AuthLinks {
+  id String @id @default(cuid())
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique @map("user_id")
+
+  code  String
+  token String @unique @default(cuid())
+
+  createdAt DateTime @default(now())
+
+  @@map("auth_links")
+}
+
+model Group {
+  id String @id @default(cuid())
+
+  name        String @map("name")
+  description String
+  code        String @unique
+
+  members Member[]
+  bets    Bet[]
+
+  @@map("groups")
+}
+
+model Member {
+  id String @id @default(cuid())
+
+  role  MemberRoles @default(MEMBER)
+  score Int         @default(0)
+
+  user  User  @relation(fields: [userId], references: [id])
+  group Group @relation(fields: [groupId], references: [id])
+
+  userId  String @map("user_id")
+  groupId String @map("group_id")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  betings Betting[]
+
+  @@unique([userId, groupId])
+  @@map("members")
+}
+
+enum MemberRoles {
+  ADMIN
+  MODERATOR
+  MEMBER
+}
+
+model Bet {
+  id String @id @default(cuid())
+
+  group   Group  @relation(fields: [groupId], references: [id])
+  groupId String @map("group_id")
+
+  participant         Participant[]
+  participantWinnerId String?       @map("participant_winner_id")
+
+  endedAt   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  betings Betting[]
+
+  @@map("posts")
+}
+
+model Participant {
+  id String @id @default(cuid())
+
+  pictureUrl String
+  name       String
+
+  bet   Bet    @relation(fields: [betId], references: [id])
+  betId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("participants")
+}
+
+model Betting {
+  id String @id @default(cuid())
+
+  participantChoosedId String @map("participant_choosed_id")
+
+  member Member @relation(fields: [memberId], references: [id])
+  bet    Bet    @relation(fields: [betId], references: [id])
+
+  memberId String @map("member_id")
+  betId    String @map("bet_id")
+
+  @@unique([memberId, betId])
+  @@map("bettings")
+}
